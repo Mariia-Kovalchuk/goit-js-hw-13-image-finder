@@ -29,9 +29,9 @@ function onSearch(e) {
         apiSearchService.search()
             .then(images => {
                 if (images.length) {
-                    refs.imageGallery.insertAdjacentHTML('beforeend', imageCardTpl(images));
-                    console.log(document.querySelector('li:last-child'));
-                    observer.observe(document.querySelector('li:last-child'));
+                    galleryMarkup(images);
+                    // refs.imageGallery.insertAdjacentHTML('beforeend', imageCardTpl(images));
+                    // observer.observe(document.querySelector('li:last-child'));
                     
                 } else {
                     errorQuery(e);
@@ -40,6 +40,11 @@ function onSearch(e) {
             .catch(console.log);
         
     };
+};
+
+function galleryMarkup(images) {
+    refs.imageGallery.insertAdjacentHTML('beforeend', imageCardTpl(images));
+    observer.observe(document.querySelector('li:last-child'));
 };
 
 function errorQuery(e) {
@@ -51,37 +56,32 @@ function errorQuery(e) {
 };
 
 
-// функция создания элемента списка
 function loadList(){
     apiSearchService.incrementPage();
-    console.log(apiSearchService.page);
     apiSearchService.search().then(images => {
-        refs.imageGallery.insertAdjacentHTML('beforeend', imageCardTpl(images))
+        if (apiSearchService.page * 12 > apiSearchService.total) {
+            error({
+                text: "No more images found.",
+                delay: 2000,
+            });
+            return;
+        };
+        galleryMarkup(images);
+        // refs.imageGallery.insertAdjacentHTML('beforeend', imageCardTpl(images));
+        // observer.observe(document.querySelector('li:last-child'));
     });
-
 };
 
 
-// для того, чтобы все время наблюдать за последним элементом списка
-// мы используем нечто вроде замыкания
-// прекращаем наблюдать за целевым элементом после создания очередного li
-// и начинаем наблюдать за этим новым (последним) элементом
 var observer = new IntersectionObserver((entries, observer) => {
-    // console.dir(entries);
     entries.forEach(entry => {
-        // console.log(entry.isIntersecting);
         if (entry.isIntersecting) {
-            console.log("entry.isIntersecting");
-            loadList()
-        }
-        // console.log(entry.target);
-        observer.unobserve(entry.target)
+            loadList();
+            observer.unobserve(entry.target);
+        };
 
-        // console.log(document.querySelector('li:last-child'));
-        observer.observe(document.querySelector('li:last-child'));
+        // observer.unobserve(entry.target);
+        // observer.observe(document.querySelector('li:last-child'));
     });
-        // console.dir(entries);
 
-}, {
-    threshold: 1
-});
+}, { threshold: 1 });
