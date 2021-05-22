@@ -30,8 +30,6 @@ function onSearch(e) {
             .then(images => {
                 if (images.length) {
                     galleryMarkup(images);
-                    // refs.imageGallery.insertAdjacentHTML('beforeend', imageCardTpl(images));
-                    // observer.observe(document.querySelector('li:last-child'));
                     
                 } else {
                     errorQuery(e);
@@ -55,7 +53,6 @@ function errorQuery(e) {
     });
 };
 
-
 function loadList(){
     apiSearchService.incrementPage();
     apiSearchService.search().then(images => {
@@ -67,8 +64,6 @@ function loadList(){
             return;
         };
         galleryMarkup(images);
-        // refs.imageGallery.insertAdjacentHTML('beforeend', imageCardTpl(images));
-        // observer.observe(document.querySelector('li:last-child'));
     });
 };
 
